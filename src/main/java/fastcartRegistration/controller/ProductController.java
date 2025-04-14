@@ -23,6 +23,7 @@ public class ProductController {
 	public ResponseEntity<Product> addProduct(@RequestBody Product product) {
 		return ResponseEntity.ok(productService.saveProduct(product));
 	}
+	
 
 	@GetMapping
 	public ResponseEntity<List<Product>> getAllProducts() {

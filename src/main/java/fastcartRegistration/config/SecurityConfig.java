@@ -15,29 +15,41 @@ import fastcartRegistration.service.UserDetailsServiceImpl;
 @Configuration
 public class SecurityConfig {
 
-	private final UserDetailsServiceImpl userDetailsService;
+    private final UserDetailsServiceImpl userDetailsService;
 
-	public SecurityConfig(UserDetailsServiceImpl userDetailsService) {
-		this.userDetailsService = userDetailsService;
-	}
+    public SecurityConfig(UserDetailsServiceImpl userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
 
-	@Bean
-	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		return http.csrf().disable()
-				.authorizeHttpRequests(auth -> auth
-						.requestMatchers("/register", "/login", "/swagger-ui/**", "/api/products/**", "/v3/api-docs/**",
-								"/swagger-ui.html")
-						.permitAll().requestMatchers("/admin/**").hasRole("ADMIN").anyRequest().authenticated())
-				.userDetailsService(userDetailsService).build();
-	}
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.csrf().disable()
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers(
+                    "/register",
+                    "/login",
+                    "/swagger-ui/**",
+                    "/v3/api-docs/**",
+                    "/swagger-ui.html",
+                    "/api/products/**",
+                    "/api/cart/**",
+                    "/api/orders/**"  // ✅ Allow access to order APIs without authentication
+                ).permitAll()
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+                .anyRequest().authenticated()
+            )
+            .userDetailsService(userDetailsService);
 
-	@Bean
-	public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-		return config.getAuthenticationManager();
-	}
+        return http.build();
+    }
 
-	@Bean
-	public PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 }
